@@ -1,0 +1,43 @@
+# Build outputs
+*.exe
+*.obj
+*.o
+*.out
+*.pdb
+*.ilk
+*.exp
+*.lib
+build/
+
+
+# Generated data files (large)
+data/my_*.txt
+data/random_*.txt
+data/test_*.txt
+!data/nist_runs_test_vector.txt
+!data/nist_longest_run_test_vector.txt
+
+# IDE / Editor
+.vs/
+.vscode/
+*.suo
+*.user
+*.sln
+*.vcxproj*
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Intel oneAPI profiling
+*.vtune
+*.advixeproj
+.vs/
+v17/
+*.db
+.vs/
+v17/
