@@ -2,12 +2,6 @@
 
 **SYCL-based Parallel Implementation of Runs Test and Longest Run of Ones Test for Randomness Assessment**
 
-Author: Deesampan Vongsurit (陆善缘)  
-Supervisor: Guanlin He (何冠霖)  
-Xihua University — School of Computer and Software Engineering
-
----
-
 ## Overview
 
 This project implements two statistical tests from the NIST SP 800-22 test suite for evaluating the quality of random and pseudorandom number generators:
