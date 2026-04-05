@@ -2,6 +2,8 @@
 
 **SYCL-based Parallel Implementation of Runs Test and Longest Run of Ones Test for Randomness Assessment**
 
+**Website:** https://deesampan.github.io/NIST-SYCL-Fastest-Randomness-Checking/ | **Live Test:** https://deesampan.github.io/NIST-SYCL-Fastest-Randomness-Checking/test.html
+
 ## Overview
 
 This project implements two statistical tests from the NIST SP 800-22 test suite for evaluating the quality of random and pseudorandom number generators:
