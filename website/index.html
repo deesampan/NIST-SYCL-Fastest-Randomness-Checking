@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NIST SP 800-22 SYCL Parallel Randomness Test Suite</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav id="navbar">
+    <div class="nav-inner">
+      <span class="nav-logo">NIST SYCL</span>
+      <ul class="nav-links">
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#structure">Structure</a></li>
+        <li><a href="#build">Build</a></li>
+        <li><a href="#usage">Usage</a></li>
+        <li><a href="#algorithm">Algorithm</a></li>
+        <li><a href="#performance">Performance</a></li>
+        <li><a href="#validation">Validation</a></li>
+        <li><a href="#references">References</a></li>
+        <li><a href="test.html" style="color:var(--accent2);font-weight:600;">&#9654; Live Test</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">NIST SP 800-22 Implementation</div>
+      <h1>NIST SP 800-22<br/><span class="accent">SYCL Parallel</span><br/>Randomness Test Suite</h1>
+      <p class="hero-sub">
+        GPU-accelerated statistical randomness testing using Intel oneAPI SYCL.<br/>
+        Implements the <strong>Runs Test</strong> and <strong>Longest Run of Ones</strong> from NIST SP 800-22.
+      </p>
+      <div class="hero-meta">
+        <span>Author &nbsp;<strong>Deesampan Vongsurit &nbsp;(陆善缘)</strong></span>
+      </div>
+      <div class="hero-buttons">
+        <a href="#build" class="btn btn-primary">Get Started</a>
+        <a href="#algorithm" class="btn btn-outline">Algorithm Details</a>
+        <a href="test.html" class="btn btn-outline" style="border-color:rgba(63,185,80,0.5);color:var(--accent2);">&#9654; Live Test</a>
+      </div>
+    </div>
+    <div class="hero-code">
+      <div class="code-window">
+        <div class="code-titlebar"><span></span><span></span><span></span></div>
+        <pre><code><span class="c-comment"># Run both tests with benchmark</span>
+./nist_sycl --generate 1000000 --benchmark
+
+<span class="c-comment">========================================</span>
+<span class="c-key">Test:</span>           Runs Test
+<span class="c-key">Device:</span>         SYCL-GPU (Intel UHD 770)
+<span class="c-key">P-value:</span>        0.842735
+<span class="c-key">Result:</span>         <span class="c-pass">PASS</span>
+<span class="c-key">Speedup:</span>        <span class="c-accent">3.88x</span>
+<span class="c-comment">========================================</span></code></pre>
+      </div>
+    </div>
+  </header>
+
+  <!-- OVERVIEW -->
+  <section id="overview" class="section">
+    <div class="container">
+      <h2 class="section-title">Overview</h2>
+      <p class="section-lead">
+        This project implements two statistical randomness tests from
+        <a href="https://csrc.nist.gov/publications/detail/sp/800-22/rev-1a/final" target="_blank">NIST SP 800-22 Rev 1a</a>
+        as both a sequential C++17 baseline and a SYCL/DPC++ parallel implementation
+        targeting Intel CPU and GPU devices through Intel oneAPI.
+      </p>
+      <div class="cards">
+        <div class="card">
+          <div class="card-icon">&#x2697;</div>
+          <h3>Runs Test</h3>
+          <p>Section 2.3 &mdash; Tests whether the number of runs (consecutive identical bits) is consistent with a truly random sequence.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#x1F4CA;</div>
+          <h3>Longest Run of Ones</h3>
+          <p>Section 2.4 &mdash; Tests whether the longest run of ones within fixed-size blocks matches the expected distribution.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#x26A1;</div>
+          <h3>SYCL Acceleration</h3>
+          <p>Parallel kernel implementations using Intel oneAPI DPC++, targeting both CPU and GPU with a shared source code.</p>
+        </div>
+        <div class="card">
+          <div class="card-icon">&#x2714;</div>
+          <h3>NIST Validated</h3>
+          <p>Results are verified against official NIST SP 800-22 reference test vectors, confirming numerical correctness.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="section section-alt">
+    <div class="container">
+      <h2 class="section-title">Features</h2>
+      <div class="features-grid">
+        <div class="feature-item">
+          <span class="feature-dot"></span>
+          <div>
+            <h4>Dual implementation</h4>
+            <p>Sequential C++17 baseline and SYCL parallel version running side-by-side for direct comparison.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-dot"></span>
+          <div>
+            <h4>Multi-backend GPU support</h4>
+            <p>Targets Intel integrated/discrete GPUs, NVIDIA (nvptx64), and AMD (amdgcn) via SYCL backend flags.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-dot"></span>
+          <div>
+            <h4>Flexible input formats</h4>
+            <p>Accepts ASCII '0'/'1' text files, packed binary files, or in-process generated random sequences.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-dot"></span>
+          <div>
+            <h4>CSV &amp; text output</h4>
+            <p>Results can be emitted as formatted text or CSV for downstream analysis and graphing.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-dot"></span>
+          <div>
+            <h4>Benchmark mode</h4>
+            <p>Runs sequential and SYCL versions on the same input and reports speedup, throughput, and p-value agreement.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-dot"></span>
+          <div>
+            <h4>Tunable work-group size</h4>
+            <p>Expose <code>--workgroup</code> flag (32 / 64 / 128 / 256 / 512) to find the optimal tile size for a given device.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-dot"></span>
+          <div>
+            <h4>Sequential-only mode</h4>
+            <p>Build and run with any C++17 compiler — no SYCL runtime or GPU required.</p>
+          </div>
+        </div>
+        <div class="feature-item">
+          <span class="feature-dot"></span>
+          <div>
+            <h4>CMake &amp; Makefile builds</h4>
+            <p>Both build systems are provided, with clear instructions for sourcing the oneAPI environment.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STRUCTURE -->
+  <section id="structure" class="section">
+    <div class="container">
+      <h2 class="section-title">Project Structure</h2>
+      <div class="structure-layout">
+        <div class="file-tree">
+          <div class="tree-line root">nist_sycl/</div>
+          <div class="tree-line l1">&#x251C;&#x2500; CMakeLists.txt</div>
+          <div class="tree-line l1">&#x251C;&#x2500; Makefile</div>
+          <div class="tree-line l1">&#x251C;&#x2500; include/</div>
+          <div class="tree-line l2">&#x2514;&#x2500; nist_tests.h</div>
+          <div class="tree-line l1">&#x251C;&#x2500; src/</div>
+          <div class="tree-line l2">&#x251C;&#x2500; main.cpp</div>
+          <div class="tree-line l2">&#x251C;&#x2500; main_seq.cpp</div>
+          <div class="tree-line l2">&#x251C;&#x2500; sequential.cpp</div>
+          <div class="tree-line l2">&#x251C;&#x2500; sycl_parallel.cpp</div>
+          <div class="tree-line l2">&#x251C;&#x2500; math_utils.cpp</div>
+          <div class="tree-line l2">&#x251C;&#x2500; io_utils.cpp</div>
+          <div class="tree-line l2">&#x2514;&#x2500; test_validation.cpp</div>
+          <div class="tree-line l1">&#x2514;&#x2500; data/</div>
+          <div class="tree-line l2">&#x251C;&#x2500; nist_runs_test_vector.txt</div>
+          <div class="tree-line l2">&#x2514;&#x2500; nist_longest_run_test_vector.txt</div>
+        </div>
+        <div class="file-desc-list">
+          <div class="file-desc">
+            <code>nist_tests.h</code>
+            <span>Common data structures, constants (α, block parameters), and all function interfaces shared between sequential and SYCL implementations.</span>
+          </div>
+          <div class="file-desc">
+            <code>sequential.cpp</code>
+            <span>O(n) sequential C++17 implementations of both tests — serves as the correctness reference and baseline for speedup measurement.</span>
+          </div>
+          <div class="file-desc">
+            <code>sycl_parallel.cpp</code>
+            <span>SYCL kernel implementations using segmented parallel reduction (Runs Test) and embarrassingly-parallel block reduction (Longest Run).</span>
+          </div>
+          <div class="file-desc">
+            <code>math_utils.cpp</code>
+            <span>Implements <code>igamc(a,x)</code> — the upper incomplete gamma function needed for the Longest Run p-value computation.</span>
+          </div>
+          <div class="file-desc">
+            <code>io_utils.cpp</code>
+            <span>File I/O (ASCII and packed binary), random sequence generation via <code>std::mt19937_64</code>, and text/CSV output formatters.</span>
+          </div>
+          <div class="file-desc">
+            <code>test_validation.cpp</code>
+            <span>Unit-test harness that compares computed p-values against official NIST reference test vectors.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUILD -->
+  <section id="build" class="section section-alt">
+    <div class="container">
+      <h2 class="section-title">Build Instructions</h2>
+
+      <div class="build-tabs">
+        <div class="build-option">
+          <h3><span class="badge">A</span> Makefile <em>(recommended)</em></h3>
+          <pre><code><span class="c-comment"># 1. Source the Intel oneAPI environment</span>
+source /opt/intel/oneapi/setvars.sh
+
+<span class="c-comment"># 2. Build everything (SYCL + sequential)</span>
+make
+
+<span class="c-comment"># 3. Run NIST validation tests</span>
+make test
+
+<span class="c-comment"># 4. Run benchmarks</span>
+make benchmark</code></pre>
+        </div>
+
+        <div class="build-option">
+          <h3><span class="badge">B</span> CMake</h3>
+          <pre><code>source /opt/intel/oneapi/setvars.sh
+mkdir build && cd build
+cmake -DCMAKE_CXX_COMPILER=icpx ..
+make -j$(nproc)</code></pre>
+        </div>
+
+        <div class="build-option">
+          <h3><span class="badge">C</span> Sequential-only (no SYCL / no GPU)</h3>
+          <pre><code><span class="c-comment"># Works with any C++17 compiler — g++, clang++, MSVC</span>
+make sequential
+
+<span class="c-comment"># Or manually:</span>
+g++ -std=c++17 -O2 -o nist_seq \
+    src/main_seq.cpp src/sequential.cpp \
+    src/math_utils.cpp src/io_utils.cpp \
+    -Iinclude -lm</code></pre>
+        </div>
+      </div>
+
+      <div class="prereqs">
+        <h3>Prerequisites</h3>
+        <div class="prereq-cols">
+          <div>
+            <h4>SYCL build</h4>
+            <ul>
+              <li>Intel oneAPI Base Toolkit 2024.1+</li>
+              <li><code>icpx</code> compiler with <code>-fsycl</code> support</li>
+              <li>Linux (Ubuntu 20.04+) or Windows WSL2</li>
+              <li>CMake 3.16+ (optional)</li>
+            </ul>
+          </div>
+          <div>
+            <h4>Sequential build</h4>
+            <ul>
+              <li>Any C++17 compiler: <code>g++ 8+</code>, <code>clang++ 10+</code>, or MSVC 2019+</li>
+              <li>No GPU or SYCL runtime required</li>
+            </ul>
+          </div>
+          <div>
+            <h4>NVIDIA GPU backend</h4>
+            <ul>
+              <li>Add to Makefile/CMake:</li>
+              <li><code>-fsycl-targets=nvptx64-nvidia-cuda</code></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- USAGE -->
+  <section id="usage" class="section">
+    <div class="container">
+      <h2 class="section-title">Usage</h2>
+      <div class="usage-layout">
+        <div class="usage-examples">
+          <h3>Examples</h3>
+          <pre><code><span class="c-comment"># Generate 1M-bit random sequence and benchmark</span>
+./nist_sycl --generate 1000000 --benchmark
+
+<span class="c-comment"># ASCII input file</span>
+./nist_sycl input.txt
+
+<span class="c-comment"># Packed binary file</span>
+./nist_sycl --binary random.bin
+
+<span class="c-comment"># Run only the Runs Test on GPU</span>
+./nist_sycl --test runs --device gpu --generate 1000000
+
+<span class="c-comment"># CSV output for analysis</span>
+./nist_sycl --format csv --generate 10000000 --benchmark > results.csv
+
+<span class="c-comment"># Tune work-group size</span>
+./nist_sycl --workgroup 128 --generate 10000000 --benchmark</code></pre>
+        </div>
+
+        <div class="usage-table-wrap">
+          <h3>Command-line Options</h3>
+          <table class="opts-table">
+            <thead>
+              <tr><th>Option</th><th>Description</th><th>Default</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><code>--device cpu|gpu|auto</code></td><td>SYCL device selection</td><td>auto</td></tr>
+              <tr><td><code>--test runs|longestrun|all</code></td><td>Which test to run</td><td>all</td></tr>
+              <tr><td><code>--length N</code></td><td>Read only first N bits</td><td>all</td></tr>
+              <tr><td><code>--workgroup W</code></td><td>Work-group size (32–512)</td><td>256</td></tr>
+              <tr><td><code>--format text|csv</code></td><td>Output format</td><td>text</td></tr>
+              <tr><td><code>--binary</code></td><td>Input is packed binary</td><td>ASCII</td></tr>
+              <tr><td><code>--generate N</code></td><td>Generate random N-bit sequence</td><td>&mdash;</td></tr>
+              <tr><td><code>--seed S</code></td><td>RNG seed for <code>--generate</code></td><td>42</td></tr>
+              <tr><td><code>--sequential-only</code></td><td>Run only sequential baseline</td><td>&mdash;</td></tr>
+              <tr><td><code>--sycl-only</code></td><td>Run only SYCL version</td><td>&mdash;</td></tr>
+              <tr><td><code>--benchmark</code></td><td>Run both and show speedup</td><td>&mdash;</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <h3 class="sub-heading">Example Output</h3>
+      <div class="output-example">
+        <div class="code-window">
+          <div class="code-titlebar"><span></span><span></span><span></span></div>
+          <pre><code>Sequence length: 1000000 bits
+
+========================================
+Test:           Runs Test
+Device:         CPU-Sequential
+Sequence Len:   1000000 bits
+Test Statistic: 500048.000000
+P-value:        0.842735
+Result:         PASS
+Time:           3.456 ms
+Throughput:     289.350 Mbits/s
+========================================
+========================================
+Test:           Runs Test
+Device:         SYCL-GPU (Intel(R) UHD Graphics 770)
+Sequence Len:   1000000 bits
+Test Statistic: 500048.000000
+P-value:        0.842735
+Result:         PASS
+Time:           0.891 ms
+Throughput:     1122.334 Mbits/s
+========================================
+>>> Runs Test Speedup: 3.88x  (Sequential: 3.456 ms, SYCL: 0.891 ms)
+>>> P-value difference: 0.00e+00  (MATCH to 6 sig figs)</code></pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ALGORITHM -->
+  <section id="algorithm" class="section section-alt">
+    <div class="container">
+      <h2 class="section-title">Algorithm Details</h2>
+
+      <div class="algo-grid">
+        <div class="algo-card">
+          <h3>Runs Test &mdash; Sequential</h3>
+          <div class="algo-complexity">O(n)</div>
+          <p>A single linear scan over the bit array counting transitions (positions where <code>b[i] &ne; b[i-1]</code>).
+             The count is <code>V<sub>obs</sub></code>. The prerequisite check <code>&pi; &isin; (2/&radic;n, 1&minus;2/&radic;n)</code>
+             is applied first; failure immediately sets <em>SKIP</em>.</p>
+          <div class="formula-box">
+            <p>P&nbsp;&nbsp;=&nbsp;&nbsp;erfc(|V<sub>obs</sub> &minus; 2n&pi;(1&minus;&pi;)| &frasl; (2&radic;(2n) &sdot; &pi;(1&minus;&pi;)))</p>
+          </div>
+        </div>
+
+        <div class="algo-card">
+          <h3>Runs Test &mdash; SYCL Parallel</h3>
+          <div class="algo-complexity">O(n/W)</div>
+          <p>The sequence is divided into chunks of 1 024 bits. Each work-item independently counts
+             transitions within its chunk and records the left/right boundary bits. A host-side
+             O(W) merge pass reconciles chunk boundaries. This achieves near-linear work with
+             W-way parallelism.</p>
+          <div class="pipeline">
+            <span>Partition</span>
+            <span class="arrow">&#x2192;</span>
+            <span>Per-chunk count</span>
+            <span class="arrow">&#x2192;</span>
+            <span>Boundary merge</span>
+            <span class="arrow">&#x2192;</span>
+            <span>P-value</span>
+          </div>
+        </div>
+
+        <div class="algo-card">
+          <h3>Longest Run &mdash; Sequential</h3>
+          <div class="algo-complexity">O(n)</div>
+          <p>Scan through N blocks of M bits each. Within each block, track the current run length,
+             updating the block maximum. Accumulate frequencies into histogram bins as defined by
+             the NIST table for the chosen (K, M, N) parameter set.</p>
+          <div class="formula-box">
+            <p>P&nbsp;&nbsp;=&nbsp;&nbsp;igamc(K/2,&nbsp;&chi;²/2)</p>
+            <p style="font-size:0.78rem;margin-top:4px;">&chi;²&nbsp;=&nbsp;&sum;<sub>i=0</sub><sup>K</sup> (v<sub>i</sub>&nbsp;&minus;&nbsp;N&pi;<sub>i</sub>)² / (N&pi;<sub>i</sub>)</p>
+          </div>
+        </div>
+
+        <div class="algo-card">
+          <h3>Longest Run &mdash; SYCL Parallel</h3>
+          <div class="algo-complexity">Embarrassingly parallel</div>
+          <p>One work-group is assigned per M-bit block. Within the group, work-items split M bits into
+             segments and compute local longest runs plus prefix/suffix run lengths. A tree reduction
+             in local (shared) memory correctly merges spans that cross segment boundaries to yield the
+             block-global maximum.</p>
+          <div class="pipeline">
+            <span>Assign WG/block</span>
+            <span class="arrow">&#x2192;</span>
+            <span>Segment runs</span>
+            <span class="arrow">&#x2192;</span>
+            <span>Tree reduction</span>
+            <span class="arrow">&#x2192;</span>
+            <span>Histogram</span>
+            <span class="arrow">&#x2192;</span>
+            <span>P-value</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="params-box">
+        <h3>NIST Block Parameters</h3>
+        <table class="opts-table">
+          <thead>
+            <tr><th>Sequence length n</th><th>Block size M</th><th>Blocks N</th><th>Classes K</th><th>v<sub>min</sub></th></tr>
+          </thead>
+          <tbody>
+            <tr><td>&ge; 128</td><td>8</td><td>16</td><td>3</td><td>1</td></tr>
+            <tr><td>&ge; 6 272</td><td>128</td><td>49</td><td>5</td><td>4</td></tr>
+            <tr><td>&ge; 750 000</td><td>10 000</td><td>75</td><td>6</td><td>10</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- PERFORMANCE -->
+  <section id="performance" class="section">
+    <div class="container">
+      <h2 class="section-title">Performance</h2>
+      <p class="section-lead">
+        Speedup is measured on an Intel UHD Graphics 770 (integrated GPU) against the sequential C++17 baseline.
+        SYCL overhead is dominant for small sequences; speedup becomes significant at &ge;1 M bits.
+      </p>
+
+      <div class="perf-bars">
+        <div class="perf-row">
+          <div class="perf-label">10 K bits</div>
+          <div class="perf-bar-wrap">
+            <div class="perf-bar-seq" style="width:100%">Sequential</div>
+            <div class="perf-bar-sycl" style="width:60%">SYCL (slower &mdash; overhead dominates)</div>
+          </div>
+        </div>
+        <div class="perf-row">
+          <div class="perf-label">100 K bits</div>
+          <div class="perf-bar-wrap">
+            <div class="perf-bar-seq" style="width:100%">Sequential</div>
+            <div class="perf-bar-sycl" style="width:80%">SYCL (&sim;1.2x)</div>
+          </div>
+        </div>
+        <div class="perf-row">
+          <div class="perf-label">1 M bits</div>
+          <div class="perf-bar-wrap">
+            <div class="perf-bar-seq" style="width:100%">Sequential &nbsp;3.456 ms</div>
+            <div class="perf-bar-sycl sycl-faster" style="width:26%">SYCL &nbsp;0.891 ms &nbsp;<strong>3.88x</strong></div>
+          </div>
+        </div>
+        <div class="perf-row">
+          <div class="perf-label">10 M bits</div>
+          <div class="perf-bar-wrap">
+            <div class="perf-bar-seq" style="width:100%">Sequential</div>
+            <div class="perf-bar-sycl sycl-faster" style="width:18%">SYCL &nbsp;<strong>&gt;5x</strong></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="perf-notes">
+        <h3>Key observations</h3>
+        <ul>
+          <li>For sequences &lt; 10 K bits, SYCL device selection, buffer allocation, and kernel launch overhead exceeds computation time. Sequential is faster.</li>
+          <li>The <strong>Longest Run test</strong> benefits more from parallelism than the Runs test because it is embarrassingly parallel at the block level.</li>
+          <li>Optimal work-group size depends on the device — experiment with <code>--workgroup 64|128|256|512</code>.</li>
+          <li>Use <code>--benchmark</code> mode to measure both implementations on the same input and see the real-world speedup for your hardware.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- VALIDATION -->
+  <section id="validation" class="section section-alt">
+    <div class="container">
+      <h2 class="section-title">Validation</h2>
+      <p class="section-lead">
+        All results are verified against the official NIST SP 800-22 reference test vectors.
+      </p>
+
+      <table class="opts-table validation-table">
+        <thead>
+          <tr><th>Test</th><th>Section</th><th>n (bits)</th><th>Expected P-value</th><th>Status</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Runs Test</td><td>2.3.8</td><td>100</td><td>0.500798</td>
+            <td><span class="pass-badge">PASS</span></td>
+          </tr>
+          <tr>
+            <td>Runs Test (small)</td><td>2.3.4</td><td>10</td><td>0.147232</td>
+            <td><span class="pass-badge">PASS</span></td>
+          </tr>
+          <tr>
+            <td>Longest Run of Ones</td><td>2.4.8</td><td>128</td><td>0.180609</td>
+            <td><span class="pass-badge">PASS</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 class="sub-heading">Run the validation suite</h3>
+      <pre><code>make test
+<span class="c-comment"># or</span>
+./build/nist_sycl_test</code></pre>
+    </div>
+  </section>
+
+  <!-- REFERENCES -->
+  <section id="references" class="section">
+    <div class="container">
+      <h2 class="section-title">References</h2>
+      <ol class="ref-list">
+        <li>
+          Rukhin, A. et al.
+          <em>NIST Special Publication 800-22 Rev 1a: A Statistical Test Suite for Random and Pseudorandom Number Generators for Cryptographic Applications.</em>
+          NIST, 2010.
+        </li>
+        <li>
+          Reinders, J., Ashbaugh, B., Brodman, J., Kinsner, M., Pennycook, J., Tian, X.
+          <em>Data Parallel C++ (2nd Edition).</em>
+          Springer, 2023.
+        </li>
+        <li>
+          The Khronos Group.
+          <em>SYCL 2020 Specification.</em>
+          Khronos Registry, 2021.
+        </li>
+        <li>
+          Intel Corporation.
+          <em>Intel oneAPI DPC++ Compiler.</em>
+          Intel Developer Zone.
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <p>
+        NIST SP 800-22 SYCL Parallel Randomness Test Suite &mdash;
+        NIST SP 800-22 SYCL Parallel Randomness Test Suite
+      </p>
+      <p class="footer-sub">Author: Deesampan Vongsurit (陆善缘)</p>
+      <p class="footer-note">NIST SP 800-22 algorithms are in the public domain.</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
