@@ -745,3 +745,202 @@ pre code {
   .structure-layout { flex-direction: column; }
   .perf-label { flex: 0 0 70px; font-size: 0.72rem; }
 }
+
+/* =====================================================
+   SYCL Benchmark section
+   ===================================================== */
+
+/* Controls */
+.bench-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+.bench-ctrl-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bench-ctrl-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+.bench-tabs {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.bench-tab {
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.83rem;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  white-space: nowrap;
+}
+.bench-tab:hover { background: var(--bg-card); color: var(--text); }
+.bench-tab.active {
+  background: rgba(88,166,255,0.12);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Device comparison rows */
+.bench-devices {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+.bdev-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+}
+.bdev-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 0 260px;
+}
+.bdev-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.bdev-label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #f0f6fc;
+}
+.bdev-sub {
+  font-size: 0.73rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+.bdev-bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bdev-bar-track {
+  height: 20px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.bdev-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  width: 0;
+}
+.bdev-stats {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 0.8rem;
+}
+.bdev-tp { font-family: var(--font-mono); font-weight: 700; font-size: 0.88rem; }
+.bdev-ms { font-family: var(--font-mono); color: var(--text-muted); }
+.bdev-su {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 2px 9px;
+  border-radius: 20px;
+  font-weight: 700;
+}
+.su-faster  { background: rgba(63,185,80,0.12); border: 1px solid rgba(63,185,80,0.3); color: var(--accent2); }
+.su-slower  { background: rgba(248,81,73,0.12); border: 1px solid rgba(248,81,73,0.3); color: var(--danger); }
+.su-neutral { background: rgba(139,148,158,0.12); border: 1px solid var(--border); color: var(--text-muted); }
+.su-baseline { font-size: 0.73rem; color: var(--text-muted); font-style: italic; }
+
+/* Speedup summary cards */
+.bench-speedup-row {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-bottom: 32px;
+}
+.su-card {
+  flex: 1 1 150px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 18px;
+  text-align: center;
+}
+.su-device { font-size: 0.78rem; font-weight: 600; margin-bottom: 6px; }
+.su-val { font-family: var(--font-mono); font-size: 1.25rem; font-weight: 700; }
+.su-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 4px; }
+
+/* Scaling chart */
+.bench-chart-wrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px 24px;
+  margin-bottom: 28px;
+}
+.bench-chart-title {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #f0f6fc;
+  margin-bottom: 4px;
+}
+.bench-chart-sub {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-bottom: 14px;
+}
+.bench-chart-legend {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+.bcl-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+.bcl-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.bench-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  overflow: visible;
+}
+
+/* Notes */
+.bench-note {
+  margin-top: 12px;
+  font-size: 0.78rem;
+  color: #484f58;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .bdev-info { flex: 0 0 140px; }
+  .bdev-sub  { display: none; }
+  .bench-speedup-row { flex-direction: column; }
+}

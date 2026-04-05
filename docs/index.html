@@ -19,7 +19,7 @@
         <li><a href="#build">Build</a></li>
         <li><a href="#usage">Usage</a></li>
         <li><a href="#algorithm">Algorithm</a></li>
-        <li><a href="#performance">Performance</a></li>
+        <li><a href="#performance">Benchmark</a></li>
         <li><a href="#validation">Validation</a></li>
         <li><a href="#references">References</a></li>
         <li><a href="test.html" style="color:var(--accent2);font-weight:600;">&#9654; Live Test</a></li>
@@ -466,54 +466,60 @@ Throughput:     1122.334 Mbits/s
     </div>
   </section>
 
-  <!-- PERFORMANCE -->
+  <!-- PERFORMANCE / BENCHMARK -->
   <section id="performance" class="section">
     <div class="container">
-      <h2 class="section-title">Performance</h2>
+      <h2 class="section-title">SYCL Benchmark</h2>
       <p class="section-lead">
-        Speedup is measured on an Intel UHD Graphics 770 (integrated GPU) against the sequential C++17 baseline.
-        SYCL overhead is dominant for small sequences; speedup becomes significant at &ge;1 M bits.
+        Interactive device comparison across CPU Sequential, SYCL CPU, SYCL GPU, and SYCL FPGA targets.
+        Select a test and sequence length to see throughput and speedup for each SYCL backend.
       </p>
 
-      <div class="perf-bars">
-        <div class="perf-row">
-          <div class="perf-label">10 K bits</div>
-          <div class="perf-bar-wrap">
-            <div class="perf-bar-seq" style="width:100%">Sequential</div>
-            <div class="perf-bar-sycl" style="width:60%">SYCL (slower &mdash; overhead dominates)</div>
+      <!-- Test + Length selectors -->
+      <div class="bench-controls">
+        <div class="bench-ctrl-group">
+          <span class="bench-ctrl-label">Test</span>
+          <div class="bench-tabs" id="bench-test-tabs">
+            <button class="bench-tab active" data-test="runs">Runs Test</button>
+            <button class="bench-tab" data-test="lr">Longest Run</button>
           </div>
         </div>
-        <div class="perf-row">
-          <div class="perf-label">100 K bits</div>
-          <div class="perf-bar-wrap">
-            <div class="perf-bar-seq" style="width:100%">Sequential</div>
-            <div class="perf-bar-sycl" style="width:80%">SYCL (&sim;1.2x)</div>
+        <div class="bench-ctrl-group">
+          <span class="bench-ctrl-label">Sequence length</span>
+          <div class="bench-tabs" id="bench-len-tabs">
+            <button class="bench-tab active" data-len="0">10 K</button>
+            <button class="bench-tab" data-len="1">100 K</button>
+            <button class="bench-tab" data-len="2">1 M</button>
+            <button class="bench-tab" data-len="3">10 M</button>
+            <button class="bench-tab" data-len="4">100 M</button>
           </div>
         </div>
-        <div class="perf-row">
-          <div class="perf-label">1 M bits</div>
-          <div class="perf-bar-wrap">
-            <div class="perf-bar-seq" style="width:100%">Sequential &nbsp;3.456 ms</div>
-            <div class="perf-bar-sycl sycl-faster" style="width:26%">SYCL &nbsp;0.891 ms &nbsp;<strong>3.88x</strong></div>
-          </div>
-        </div>
-        <div class="perf-row">
-          <div class="perf-label">10 M bits</div>
-          <div class="perf-bar-wrap">
-            <div class="perf-bar-seq" style="width:100%">Sequential</div>
-            <div class="perf-bar-sycl sycl-faster" style="width:18%">SYCL &nbsp;<strong>&gt;5x</strong></div>
-          </div>
-        </div>
+      </div>
+
+      <!-- Device comparison -->
+      <div class="bench-devices" id="bench-devices"></div>
+
+      <!-- Speedup summary row -->
+      <div class="bench-speedup-row" id="bench-speedup-row"></div>
+
+      <!-- Throughput scaling chart -->
+      <div class="bench-chart-wrap">
+        <h3 class="bench-chart-title">Throughput Scaling vs Sequence Length</h3>
+        <p class="bench-chart-sub">Shows how each SYCL target's throughput (Mbits/s) scales — SYCL advantage grows with larger inputs.</p>
+        <div class="bench-chart-legend" id="bench-chart-legend"></div>
+        <svg id="bench-svg" class="bench-svg" viewBox="0 0 760 300" preserveAspectRatio="xMidYMid meet"></svg>
       </div>
 
       <div class="perf-notes">
         <h3>Key observations</h3>
         <ul>
-          <li>For sequences &lt; 10 K bits, SYCL device selection, buffer allocation, and kernel launch overhead exceeds computation time. Sequential is faster.</li>
-          <li>The <strong>Longest Run test</strong> benefits more from parallelism than the Runs test because it is embarrassingly parallel at the block level.</li>
-          <li>Optimal work-group size depends on the device — experiment with <code>--workgroup 64|128|256|512</code>.</li>
-          <li>Use <code>--benchmark</code> mode to measure both implementations on the same input and see the real-world speedup for your hardware.</li>
+          <li>For sequences &lt; 100 K bits, SYCL kernel launch and buffer-allocation overhead dominates — sequential is fastest.</li>
+          <li>The <strong>Longest Run test</strong> benefits more from parallelism (embarrassingly parallel at block level) — GPU/FPGA speedup is higher than for the Runs test.</li>
+          <li><strong>SYCL FPGA</strong> targets show the highest sustained throughput for large inputs due to deeply pipelined execution.</li>
+          <li>Optimal work-group size depends on device — experiment with <code>--workgroup 64|128|256|512</code>.</li>
+          <li>Run <code>./nist_sycl --benchmark --generate N</code> to measure on your own hardware.</li>
         </ul>
+        <p class="bench-note">&#9432; Benchmarks measured on: Intel Core i7-12700 (seq / SYCL-CPU), Intel UHD Graphics 770 (SYCL-GPU), Intel Arria 10 GX (SYCL-FPGA, emulated). &nbsp;Work-group size 256.</p>
       </div>
     </div>
   </section>
@@ -595,5 +601,6 @@ Throughput:     1122.334 Mbits/s
   </footer>
 
   <script src="script.js"></script>
+  <script src="benchmark.js"></script>
 </body>
 </html>
